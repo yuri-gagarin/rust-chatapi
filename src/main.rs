@@ -3,16 +3,21 @@ use actix_web::{get, post, web};
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
+use routes::routes::{get_messages};
+
 mod models;
-struct AppState {
+mod routes;
+mod helpers;
+#[derive(Debug)]
+pub struct AppState {
     total_messages: u32,
     messages: Mutex<Vec<MessageData>>,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
-struct MessageData {
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MessageData {
     id: i32,
-    date: i64,
+    date: String,
     sender: String,
     receiver: String,
     data: String,
@@ -45,6 +50,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(app_data.clone())
             .service(index_route)
             .service(create_route)
+            .service(get_messages)
             .service(web::scope("/app")).route("/index.html", web::get().to(index_page))
     })
     .bind(("127.0.0.1", 8080))?
