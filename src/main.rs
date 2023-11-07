@@ -1,10 +1,10 @@
 use actix_web::{App, HttpResponse, HttpServer, Responder};
-use actix_web::{get, post, web};
+use actix_web::{get, web};
 use helpers::data_helpers::generate_mock_messages;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
-use routes::routes::{get_messages, create_message};
+use routes::routes::{get_messages, create_message, edit_message};
 
 mod models;
 mod routes;
@@ -12,7 +12,7 @@ mod helpers;
 
 #[derive(Debug)]
 pub struct AppState {
-    total_messages: u32,
+    total_messages: Mutex<u32>,
     messages: Mutex<Vec<MessageData>>,
 }
 
@@ -44,7 +44,7 @@ async fn index_page() -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let app_data = web::Data::new(AppState{
-      total_messages: 0,
+      total_messages: Mutex::new(5),
       messages: Mutex::new(generate_mock_messages(5))
     });
 
@@ -55,6 +55,7 @@ async fn main() -> std::io::Result<()> {
             //.service(create_route)
             .service(get_messages)
             .service(create_message)
+            .service(edit_message)
             .service(web::scope("/app")).route("/index.html", web::get().to(index_page))
     })
     .bind(("127.0.0.1", 8080))?
