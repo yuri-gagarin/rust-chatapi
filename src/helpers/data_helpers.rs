@@ -29,3 +29,10 @@ pub fn generate_single_message() -> MessageData {
     };
     mock_message
 }
+
+pub fn generate_rand_id() -> i64 {
+    chrono::Utc::now().timestamp()
+}
+pub fn generate_date_now() -> String {
+    chrono::Utc::now().to_string()
+}
