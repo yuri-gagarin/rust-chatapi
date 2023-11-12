@@ -28,6 +28,7 @@ pub struct Conversation {
 
 #[derive(Clone, Deserialize)]
 pub struct Message {
+    id: String,
     sender_id: String,
     receiver_id: String,
     conversation_id: String,

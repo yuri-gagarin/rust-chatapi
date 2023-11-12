@@ -36,3 +36,14 @@ pub fn generate_rand_id() -> i64 {
 pub fn generate_date_now() -> String {
     chrono::Utc::now().to_string()
 }
+
+pub fn invalid_id_param(param: String) -> (bool, i64) {
+    match param.parse::<i64>() {
+        Ok(res) => {
+            (false, res)
+        }
+        Err(error) => {
+            (true, 0)
+        }
+    }
+}

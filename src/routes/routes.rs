@@ -6,8 +6,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 /* Local dependencies */
 use crate::{AppState, MessageData};
-use crate::helpers::data_helpers;
-use crate::helpers::validation_helpers;
+use crate::helpers::{data_helpers, validation_helpers};
 
 #[derive(Serialize)]
 pub struct ResponseData {
@@ -124,15 +123,22 @@ pub async fn create_message(data: web::Data<AppState>, message_data: web::Json<N
 }
 
 #[put("/api/messages/{message_id}")]
-pub async fn edit_message(
-    data: web::Data<AppState>, 
-    message_data: web::Json<EditMsgReqData>,
-    path: web::Path<String>, 
-    query: web::Query<MsgQueryParams>
-  ) -> HttpResponse {
+pub async fn edit_message(data: web::Data<AppState>, message_data: web::Json<EditMsgReqData>,
+                          path: web::Path<String>, query: web::Query<MsgQueryParams>) -> HttpResponse {
     /* Validate required JSON keys */
-    let () = validation_helpers::validate_new_message_input(message_data)
-    let (message_id) = path.into_inner();
+    let (invalid_data, error_messages) = validation_helpers::validate_edit_message_input(&message_data);
+    if invalid_data {
+        return HttpResponse::BadRequest().json(error_messages);
+    }
+    /* Validate correct data */
+    let validation_result = message_data.validate();
+    if validation_result.is_err() {
+        let errors = validation_result.unwrap_err();
+        return HttpResponse::BadRequest().json(errors)
+    }
+    let (valid, id) = data_helpers::convert_param_to_int(path.into_inner());
+    let mut message_state = data.messages.lock().unwrap();
+    let remove_index = message_state.iter().position(|val| val.id == message_id)
     println!("The path is {}", message_id);
     HttpResponse::Ok().json("ok")
 }
