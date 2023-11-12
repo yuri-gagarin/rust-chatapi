@@ -1,5 +1,5 @@
 use actix_web::web;
-use crate::routes::routes::{NewMsgReqData, EditMsgReqData};
+use super::super::routes::types::{NewMsgReqData, EditMsgReqData};
 
 pub fn validate_new_message_input(message_data: &web::Json<NewMsgReqData>) -> (bool, Vec<String>) {
     let mut errors: Vec<String> = Vec::new();

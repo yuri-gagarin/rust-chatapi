@@ -4,7 +4,7 @@ use helpers::data_helpers::generate_mock_messages;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
-use routes::routes::{get_messages, create_message, edit_message};
+use routes::message_routes::{get_messages, create_message};
 
 mod models;
 mod routes;
@@ -55,7 +55,7 @@ async fn main() -> std::io::Result<()> {
             //.service(create_route)
             .service(get_messages)
             .service(create_message)
-            .service(edit_message)
+            //.service(edit_message)
             .service(web::scope("/app")).route("/index.html", web::get().to(index_page))
     })
     .bind(("127.0.0.1", 8080))?
