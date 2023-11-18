@@ -4,14 +4,14 @@ use validator::Validate;
 //
 use crate::MessageData;
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 pub struct ResponseData {
     pub response_message: String,
     pub messages: Option<Vec<MessageData>>,
     pub new_message: Option<MessageData>,
     pub edited_message: Option<MessageData>,
     pub deleted_message: Option<MessageData>,
-    pub total_messages: Option<u32>,
+    pub total_messages: u32,
     pub error_messages: Option<Vec<String>>
 }
 
