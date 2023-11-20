@@ -10,6 +10,41 @@ use crate::helpers::response_helpers::{MessageResponses, SingleMsgRes};
 //
 use super::types::{NewMsgReqData, EditMsgReqData, MsgQueryParams, ResponseData};
 
+
+#[get("/api/messages/{message_id}")]
+pub async fn get_single_message(data: web::Data<AppState>, path: web::Path<String>) -> HttpResponse<BoxBody> {
+    let messages = data.messages.lock().unwrap();
+    let total_messages = data.total_messages.lock().unwrap();
+    // ensure that a {message_id} can be parsed //
+    let (invalid_id_param, message_id) = data_helpers::invalid_id_params(path.into_inner());
+    if invalid_id_param {
+        let data_response: ResponseData = MessageResponses::error_response(
+            String::from("URL data error"), 
+            *total_messages,
+            vec!["Could not resolve param <message_id>".into(), "Please check the correct URL".into()]
+        );
+        return  HttpResponse::BadRequest().json(data_response);
+    }
+    // find using {message_id} param //
+    let msg_index = messages.iter().position(|val| val.id == message_id);
+    if msg_index.is_none() {
+        let data_response: ResponseData = MessageResponses::error_response(
+            String::from("Message edit error"),
+            *total_messages,
+            vec!["Message you're querying does not exist".to_string()]
+        );
+        return  HttpResponse::BadRequest().json(data_response);
+    }
+    let queried_message = messages[msg_index.unwrap()].clone();
+    let response_data = MessageResponses::single_message_response(
+        String::from("Queried message"), 
+        *total_messages, 
+        queried_message,
+        SingleMsgRes::QueriedRes
+    );
+    HttpResponse::Ok().json(response_data)
+}
+
 // Message Model Routes //
 #[get("/api/messages")]
 pub async fn get_messages(data: web::Data<AppState>) -> HttpResponse {
@@ -76,6 +111,11 @@ pub async fn edit_message(data: web::Data<AppState>, message_data: web::Json<Edi
     /* Validate required JSON keys */
     let (invalid_data, error_messages) = validation_helpers::validate_edit_message_input(&message_data);
     if invalid_data {
+        let  response_data = MessageResponses::error_response(
+            String::from("Invalid JSON data"), 
+            total_messages, 
+            vec!["JSON is invalid".into(), "Please check the JSON keys and values".into()]
+        );
         return HttpResponse::BadRequest().json(error_messages);
     }
     /* Validate correct data */

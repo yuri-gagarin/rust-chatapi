@@ -7,7 +7,8 @@ use crate::MessageData;
 #[derive(Clone, Serialize)]
 pub struct ResponseData {
     pub response_message: String,
-    pub messages: Option<Vec<MessageData>>,
+    pub message: Option<MessageData>,
+    pub messages_list: Option<Vec<MessageData>>,
     pub new_message: Option<MessageData>,
     pub edited_message: Option<MessageData>,
     pub deleted_message: Option<MessageData>,

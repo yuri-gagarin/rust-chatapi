@@ -4,6 +4,7 @@ use crate::MessageData;
 use super::super::routes::types::ResponseData;
 
 pub enum SingleMsgRes {
+    QueriedRes,
     CreatedRes,
     EditedRes,
     DeletedRes,
@@ -14,7 +15,8 @@ impl MessageResponses {
     pub fn error_response(response_message: String, total_messages: u32, error_messages: Vec<String>) -> ResponseData {
         let response = ResponseData {
             response_message: response_message,
-            messages: None,
+            messages_list: None,
+            message: None,
             new_message: None,
             edited_message: None,
             deleted_message: None,
@@ -26,7 +28,8 @@ impl MessageResponses {
     pub fn all_messages_response(response_message: String, total_messages: u32, messages: Vec<MessageData>) -> ResponseData {
         let response = ResponseData {
             response_message,
-            messages: Some(messages),
+            messages_list: Some(messages),
+            message: None,
             new_message: None,
             edited_message: None,
             deleted_message: None,
@@ -39,7 +42,8 @@ impl MessageResponses {
                                    message_data: MessageData, response_type:SingleMsgRes) -> ResponseData {
         let mut response = ResponseData {
             response_message,
-            messages: None,
+            messages_list: None,
+            message: None,
             new_message: None,
             edited_message: None,
             deleted_message: None,
@@ -47,6 +51,10 @@ impl MessageResponses {
             error_messages: None,
         };
         match response_type {
+            SingleMsgRes::QueriedRes => {
+                response.message = Some(message_data);
+                response
+            }
             SingleMsgRes::CreatedRes => {
                 response.new_message = Some(message_data);
                 response.total_messages += 1;
