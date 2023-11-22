@@ -4,11 +4,12 @@ use helpers::data_helpers::generate_mock_messages;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
-use routes::message_routes::{get_messages, create_message, get_single_message};
+use routes::message_routes::{get_messages, create_message, get_single_message, edit_message};
 
 mod models;
 mod routes;
 mod helpers;
+mod sockets;
 
 #[derive(Debug)]
 pub struct AppState {
@@ -55,6 +56,7 @@ async fn main() -> std::io::Result<()> {
             //.service(create_route)
             .service(get_messages)
             .service(get_single_message)
+            .service(edit_message)
             .service(create_message)
             //.service(edit_message)
             .service(web::scope("/app")).route("/index.html", web::get().to(index_page))
